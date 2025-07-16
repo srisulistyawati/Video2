@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Video Pembelajaran</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+
+    video {
+      width: 360px;
+      height: auto;
+      border: 1px solid #ccc;
+    }
+
+    #seekwarn {
+      display: none;
+      margin-top: 10px;
+      color: red;
+      font-weight: bold;
+    }
+
+    #playBtn, #nextBtn {
+      margin-top: 20px;
+      padding: 12px 24px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    #playBtn {
+      background-color: #28a745;
+      color: white;
+    }
+
+    #nextBtn {
+      display: none;
+      background-color: #007bff;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Tonton Video Sampai Selesai</h2>
+
+  <video id="vid" playsinline webkit-playsinline>
+    <source src="https://res.cloudinary.com/dhnnlvllh/video/upload/v1752333541/vidio1_t3vdik.mp4" type="video/mp4">
+    Browser Anda tidak mendukung video.
+  </video>
+
+  <br>
+  <button id="playBtn">▶️ Play</button>
+
+  <div id="seekwarn">⛔ Jangan skip videonya!</div>
+
+  <button id="nextBtn" onclick="goToForm()">Lanjut ke Form</button>
+
+  <script>
+    const video = document.getElementById('vid');
+    const playBtn = document.getElementById('playBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const seekwarn = document.getElementById('seekwarn');
+
+    let lastTime = 0;
+    let seeking = false;
+    let allowSeek = false;
+
+    window.onload = function() {
+      playBtn.style.display = 'inline-block';
+    };
+
+    playBtn.onclick = function() {
+      video.play();
+      playBtn.style.display = 'none';
+    };
+
+    video.addEventListener('timeupdate', function() {
+      if (!seeking) lastTime = video.currentTime;
+    });
+
+    video.addEventListener('seeking', function() {
+      if (!allowSeek && Math.abs(video.currentTime - lastTime) > 1) {
+        seeking = true;
+        video.currentTime = lastTime;
+        seekwarn.style.display = 'block';
+        setTimeout(() => seekwarn.style.display = 'none', 1500);
+        seeking = false;
+      }
+    });
+
+    video.addEventListener('ratechange', function() {
+      if (video.playbackRate !== 1) {
+        video.playbackRate = 1;
+      }
+    });
+
+    video.onended = function() {
+      allowSeek = true;
+      nextBtn.style.display = "inline-block";
+      window.onbeforeunload = null;
+    };
+
+    window.history.pushState(null, null, window.location.href);
+    window.onpopstate = function(event) {
+      window.history.pushState(null, null, window.location.href);
+      alert('Anda harus menonton video sampai selesai sebelum kembali!');
+    };
+
+    window.onbeforeunload = function() {
+      return "Anda harus menonton video sampai selesai sebelum meninggalkan halaman ini!";
+    };
+
+    function goToForm() {
+      window.open("https://docs.google.com/forms/d/e/1FAIpQLSe8qB8SqK6npqJEp_04z78sFhFvBKGDRGwEVdHPJy_nLbykng/viewform?usp=dialog", '_blank');
+      window.close();
+    }
+  </script>
+</body>
+</html>
